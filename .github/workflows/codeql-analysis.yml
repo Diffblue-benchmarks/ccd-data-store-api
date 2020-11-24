@@ -63,7 +63,7 @@ jobs:
     #   make bootstrap
     #   make release
     - run: |
-        ./gradlew build -x test -x pmdMain -x pmdTest -x jacocoTestReport --no-daemon -x spotbugsMain -x spotbugsAat -x spotbugsTest --stacktrace --scan
+        ./gradlew build -x test -x pmdMain -x pmdTest -x jacocoTestReport --no-daemon -x spotbugsMain -x spotbugsAat -x spotbugsTest --stacktrace --scan -Dorg.gradle.internal.htt.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Dhttp.socketTimeout=60000 -Dhtt.connectionTimeout=60000
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
