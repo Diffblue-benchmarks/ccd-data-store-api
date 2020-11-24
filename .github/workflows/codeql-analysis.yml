@@ -63,7 +63,7 @@ jobs:
     #   make bootstrap
     #   make release
     - run: |
-        ./gradlew build -x test -x pmdMain -x pmdTest -x jacocoTestReport
+        ./gradlew build -x test -x pmdMain -x pmdTest -x jacocoTestReport --no-daemon
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
