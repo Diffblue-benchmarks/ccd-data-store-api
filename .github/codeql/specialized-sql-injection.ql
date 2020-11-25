@@ -33,4 +33,4 @@ class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
 from AggressiveSQLInjectionFlow config,
   DataFlow::Node source, DataFlow::Node sink
 where config.hasFlow(source, sink)
-select source, " flows to $@ ", sink
+select sink.getNode(), source, sink, "potential SQL injection"
