@@ -1,0 +1,3 @@
+name: codeql-ccd-data-store-api
+version: 0.0.0
+libraryPathDependencies: codeql-java
