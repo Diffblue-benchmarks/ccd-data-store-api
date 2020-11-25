@@ -35,4 +35,4 @@ from
   DataFlow::Node source, DataFlow::Node sink,
   AggressiveSQLInjectionFlow config
 where config.hasFlow(source, sink)
-select source, sink, "potential SQL injection"
+select source, sink, "potential SQL injection: @."
