@@ -1,13 +1,12 @@
 /**
  * @name Aggressive project-specific SQL injection detection
- * @kind path-problem
+ * @kind problem
  * @problem.severity error
  * @id ccd-data-store-api/specialized-sql-injection
  */
 
 import semmle.code.java.Expr
 import semmle.code.java.dataflow.FlowSources
-import SqlInjectLib
 import DataFlow::PathGraph
 
 class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
@@ -33,7 +32,7 @@ class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
 }
 
 from 
-  DataFlow::PathNode source, DataFlow::PathNode sink,
+  DataFlow::Node source, DataFlow::Node sink,
   AggressiveSQLInjectionFlow config
 where config.hasFlow(source, sink)
-select sink.getNode(), source, sink, "potential SQL injection"
+select source, sink, "potential SQL injection"
