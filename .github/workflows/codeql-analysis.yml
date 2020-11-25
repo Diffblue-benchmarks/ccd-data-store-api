@@ -68,3 +68,9 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+
+    - name: Upload CodeQL analysis result as artefact
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-result
+        path: results/java-custom.sarif
