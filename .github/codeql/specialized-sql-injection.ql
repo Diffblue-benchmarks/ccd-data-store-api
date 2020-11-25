@@ -1,5 +1,8 @@
 /**
  * @name Aggressive project-specific SQL injection detection
+ * @description More aggressive SQL injection detection for demonstration
+ *   purposes
+ * @precision low
  * @kind path-problem
  * @problem.severity error
  * @id ccd-data-store-api/specialized-sql-injection
