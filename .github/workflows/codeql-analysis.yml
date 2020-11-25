@@ -73,4 +73,5 @@ jobs:
     - run: |
         pwd
         ls /home/runner/work/ccd-data-store-api/results
+        cat /home/runner/work/ccd-data-store-api/results/java-custom.sarif
 
