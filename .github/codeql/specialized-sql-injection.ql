@@ -6,7 +6,8 @@
  */
 
 import java
-import semmle.code.java.dataflow.TaintTracking
+import semmle.code.java.dataflow.FlowSources
+import DataFlow::PathGraph
 
 class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
     AggressiveSQLInjectionFlow() { this = "AggressiveSQLInjectionFlow" }
