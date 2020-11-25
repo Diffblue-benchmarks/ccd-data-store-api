@@ -1,6 +1,6 @@
 /**
  * @name Aggressive project-specific SQL injection detection
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
  * @id ccd-data-store-api/specialized-sql-injection
  */
