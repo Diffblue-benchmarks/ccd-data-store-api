@@ -48,6 +48,7 @@ jobs:
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
         queries: "./.github/codeql/specialized-sql-injection.ql"
 
+
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     #- name: Autobuild
@@ -69,8 +70,7 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
 
-    - name: Upload CodeQL analysis result as artefact
-      uses: actions/upload-artifact@v2
-      with:
-        name: analysis-result
-        path: results/java-custom.sarif
+    - run: |
+        pwd
+        ls /home/runner/work/ccd-data-store-api/results
+
