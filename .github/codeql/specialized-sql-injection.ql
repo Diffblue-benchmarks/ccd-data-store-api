@@ -22,8 +22,14 @@ class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
     override predicate isSink(DataFlow::Node sink) {
         exists (VirtualMethodAccess m |
             m.getArgument(0) = sink.asExpr() and
-            m.getMethod().getName() = "createNativeQuery"
-            )
+            m.getMethod().getName() = "createNativeQuery")
+    }
+
+    override predicate isSanitizer(DataFlow::Node node) {
+        exists (VirtualMethodAccess m |
+            m = node.asExpr() and
+            (m.getMethod().getName() = "secure" or
+             m.getMethod().getName() = "addParameters"))
     }
 
     override predicate isAdditionalTaintStep(DataFlow::Node source, DataFlow::Node sink) {
