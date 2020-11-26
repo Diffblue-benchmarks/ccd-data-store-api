@@ -26,8 +26,8 @@ def load_SARIF_file(path, supported_rules):
 
 def prepare_git_configuration():
     print('Preparing git configuration')
-    #subprocess.call(['git', 'config', 'user.name', 'Diffblue Security Bot'])
-    #subprocess.call(['git', 'config', 'user.email', 'johannes.kloos@diffblue.com'])
+    subprocess.call(['git', 'config', 'user.name', 'Diffblue Security Bot'])
+    subprocess.call(['git', 'config', 'user.email', 'johannes.kloos@diffblue.com'])
 
 def compute_instantiations(flows, fixes_for_rule):
     # TODO actually do something here!
