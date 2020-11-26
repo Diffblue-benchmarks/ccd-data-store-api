@@ -29,3 +29,5 @@ nbdist/
 ### Gradle
 .gradle/
 out/
+/.github/codeql/.cache
+/codeqldb
