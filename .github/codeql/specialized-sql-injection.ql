@@ -8,7 +8,7 @@
  * @id ccd-data-store-api/specialized-sql-injection
  */
 
-import semmle.code.java.Expr
+import java
 import semmle.code.java.dataflow.FlowSources
 import DataFlow::PathGraph
 
@@ -35,7 +35,7 @@ class AggressiveSQLInjectionFlow extends TaintTracking::Configuration {
 }
 
 from 
-  DataFlow::Node source, DataFlow::Node sink,
+  DataFlow::PathNode source, DataFlow::PathNode sink,
   AggressiveSQLInjectionFlow config
-where config.hasFlow(source, sink)
-select source, sink, "potential SQL injection: @."
+where config.hasFlowPath(source, sink)
+select sink.getNode(), source, sink, "Query might include data from $@.", source.getNode(), "this user input"
