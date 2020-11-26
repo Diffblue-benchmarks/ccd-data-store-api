@@ -73,3 +73,6 @@ jobs:
     - run: |
         .github/bin/diffblue-security-fix /home/runner/work/ccd-data-store-api/results/java-custom.sarif
 
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@v3
+
