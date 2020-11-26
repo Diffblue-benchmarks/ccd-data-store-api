@@ -1,0 +1,79 @@
+#! /usr/bin/env python3
+
+# Smoke & Mirrors ahoy!
+import json
+import re
+import subprocess
+import sys
+
+def load_SARIF_file(path, supported_rules):
+    with open(path, 'r') as jsonfile:
+        sarif = json.load(jsonfile)
+        vulnerabilities_by_type = {}
+        for run in sarif["runs"]:
+            for result in run["results"]:
+                rule = result["ruleId"]
+                if rule in supported_rules:
+                    for code_flow in result["codeFlows"]:
+                        for thread_flow in code_flow["threadFlows"]:
+                            try:
+                                vulnerabilities = vulnerabilities_by_type[rule]
+                            except:
+                                vulnerabilities = []
+                                vulnerabilities_by_type[rule] = vulnerabilities
+                            vulnerabilities.append(thread_flow["locations"])
+        return vulnerabilities_by_type
+
+def prepare_git_configuration():
+    print('Preparing git configuration')
+    #subprocess.call(['git', 'config', 'user.name', 'Diffblue Security Bot'])
+    #subprocess.call(['git', 'config', 'user.email', 'johannes.kloos@diffblue.com'])
+
+def compute_instantiations(flows, fixes_for_rule):
+    # TODO actually do something here!
+    return ["placeholder"]
+
+def select_covering_set(instantiations, flows):
+    # TODO actually do something here!
+    return [ { "covers": flows } ]
+
+def apply_changes(best_fix):
+    # TODO replace smoke&mirrors with actual code
+    subprocess.call(['patch', '-p1', '-i', '.github/smoke-and-mirrors.patch'])
+
+def find_fix(supported_rules, rule, flows):
+    instantiations = compute_instantiations(flows, supported_rules[rule])
+    if len(instantiations) == 0:
+        print('  No fix found, giving up')
+        return None
+    print('  Found {} possible fix instantiations; selecting covering set'.format(len(instantiations)))
+    best_fix = select_covering_set(instantiations, flows)
+    covered_set = set()
+    for change in best_fix:
+        covered_set |= set([str(flow) for flow in change["covers"]])
+    print('  Found change set with {} logical changes, covering {}/{} vulnerabilities; generating patch'.format(len(best_fix), len(covered_set), len(flows)))
+    return best_fix
+
+def commit_fix(rule):
+    print('Changes applied, committing')
+    subprocess.call(['git', 'commit', '--all', '--message=Fix security vulnerabilities: ' + rule])
+
+
+def main():    
+    supported_rules = { "ccd-data-store-api/specialized-sql-injection": "TBD" }
+    sarif = load_SARIF_file(sys.argv[1], supported_rules)
+    if len(sarif) == 0:
+        print('  No known vulnerabilities found, exiting')
+        return
+    print('Found {} known types of vulnerabilities:'.format(len(sarif)))
+    for rule in sarif:
+        print('  {}: {} instances'.format(rule, len(sarif[rule])))
+    prepare_git_configuration()
+    for rule in sarif:        
+        print('Trying to find fixes for {}'.format(rule))
+        flows = sarif[rule]
+        best_fix = find_fix(supported_rules, rule, flows)
+        if best_fix is not None:
+            apply_changes(best_fix)
+
+main()
