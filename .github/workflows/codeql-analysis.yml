@@ -56,8 +56,8 @@ jobs:
     - run: |
         ls $CODEQL_DIST
         env
-        ls /home/runner/work/ccd-data-store-api/results/
-        .github/bin/diffblue-security-fix /home/runner/work/ccd-data-store-api/results/java-custom.sarif
+        find / -name \*.bqrs 2>/dev/null || exit 0
+        #.github/bin/diffblue-security-fix /home/runner/work/ccd-data-store-api/results/java-custom.sarif
 
     - name: Create pull request
       uses: peter-evans/create-pull-request@v3
