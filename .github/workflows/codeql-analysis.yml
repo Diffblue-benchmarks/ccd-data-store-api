@@ -71,6 +71,7 @@ jobs:
       uses: github/codeql-action/analyze@v1
 
     - run: |
+        find / -name codeql
         .github/bin/diffblue-security-fix /home/runner/work/ccd-data-store-api/results/java-custom.sarif
 
     - name: Create pull request
