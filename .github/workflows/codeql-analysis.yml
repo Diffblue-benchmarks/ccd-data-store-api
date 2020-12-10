@@ -57,6 +57,7 @@ jobs:
         $CODEQL_DIST/codeql bqrs decode -r allEdges --format=json --output=../results/java-custom.allEdges.json $CODEQL_EXTRACTOR_JAVA_WIP_DATABASE/results/codeql-ccd-data-store-api/specialized-sql-injection.bqrs
         cat  ../results/java-custom.allEdges.json
         .github/bin/diffblue-security-fix ../results/java-custom.sarif ../results/java-custom.allEdges.json
+        git status
 
     - name: Create pull request
       uses: peter-evans/create-pull-request@v3
