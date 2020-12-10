@@ -1,0 +1,49 @@
+name: Test CI
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout this branch
+        uses: actions/checkout@v2
+        with:
+          token: ${{ github.token }}
+
+      - name: Fetch git
+        run: |
+          git fetch origin
+          git checkout ${{ github.head_ref }}
+
+      # Creates a new branch name based on the base
+      - name: Output new branch name based of the base and head branch
+        id: branch-name
+        run: |
+          NEW_BRANCH="testBranch/${{github.base_ref}}-${{github.head_ref}}"
+          echo "Branch name is $NEW_BRANCH"
+          echo "NEW_BRANCH=$NEW_BRANCH" >> $GITHUB_ENV
+          echo "::set-output name=branch-name::$NEW_BRANCH"
+          git checkout -b "$NEW_BRANCH"
+          git config --global user.email "db-ci-platform@diffblue.com"
+          git config --global user.name "Diffblue CI"
+          rm gradlew
+          git add -A
+          git commit -m "Example Commit"
+          git push -u origin "$NEW_BRANCH"
+
+      
+      - name: Make pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: "${{ steps.branch-name.outputs.branch-name }}"
+          destination_branch: "${{github.head_ref}}"
+          pr_title: "Test PR"
+          pr_body: "This is a test PR please ignore"
+          github_token: ${{ github.token }}
