@@ -1,4 +1,4 @@
-name: Test CI
+name: Example CI
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -7,7 +7,7 @@ env:
   COMMENT_ID: diffblue-test-result-comment-${{github.base_ref}}-${{github.head_ref}}
 
 jobs:
-  test-pr:
+  security:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -20,10 +20,16 @@ jobs:
         with:
           token: ${{ github.token }}
 
-      - name: Fetch git
+      - name: Setup git
         run: |
           git fetch origin
           git checkout ${{ github.head_ref }}
+          git config --global user.email "db-ci-platform@diffblue.com"
+          git config --global user.name "Diffblue CI"
+
+      - name: Do security stuff(Make a change to files)
+        run: |
+          rm gradlew
 
       # Creates a new branch name based on the base
       - name: Output new branch name based of the base and head branch
@@ -34,14 +40,13 @@ jobs:
           echo "NEW_BRANCH=$NEW_BRANCH" >> $GITHUB_ENV
           echo "::set-output name=branch-name::$NEW_BRANCH"
 
+      - name: Commit and create branch
+        run: |
           git branch -D "$NEW_BRANCH" || true
           git push origin --delete "$NEW_BRANCH" || true
           git checkout -b "$NEW_BRANCH"
-          git config --global user.email "db-ci-platform@diffblue.com"
-          git config --global user.name "Diffblue CI"
-          rm gradlew
           git add -A
-          git commit -m "Example Commit"
+          git commit -m "Sample commit"
           git push -u origin "$NEW_BRANCH"
 
       - name: Make pull request
@@ -49,8 +54,8 @@ jobs:
         with:
           source_branch: "${{ steps.branch-name.outputs.branch-name }}"
           destination_branch: "${{github.head_ref}}"
-          pr_title: "Test PR"
-          pr_body: "This is a test PR please ignore"
+          pr_title: "Fix Security issue"
+          pr_body: "This is an automated PR to fix a security issue that we detected was created by your PR"
           github_token: ${{ github.token }}
 
       # Find PR number
@@ -67,10 +72,9 @@ jobs:
           number: ${{ steps.find-pull-request.outputs.number }}
           sha: ${{ steps.find-pull-request.outputs.head-sha }}
 
-      
       - name: Update comment on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2
         with:
-          message: "Suggested changei Review [this PR](https://github.com/$GITHUB_REPOSITORY/pull/${{ steps.find-pull-request.outputs.number }})"
+          message: "Diffblue has detected a vunrability caused by changes in your PR. Please review and merge [this PR](https://github.com/Diffblue-benchmarks/ccd-data-store-api/pull/${{ steps.find-pull-request.outputs.number }}) "
           GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
