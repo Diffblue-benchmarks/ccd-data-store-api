@@ -3,6 +3,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+env:
+  COMMENT_ID: diffblue-test-result-comment-${{github.base_ref}}-${{github.head_ref}}
+
 jobs:
   test-pr:
     runs-on: ubuntu-latest
@@ -30,6 +33,9 @@ jobs:
           echo "Branch name is $NEW_BRANCH"
           echo "NEW_BRANCH=$NEW_BRANCH" >> $GITHUB_ENV
           echo "::set-output name=branch-name::$NEW_BRANCH"
+
+          git branch -D "$NEW_BRANCH" || true
+          git push origin --delete "$NEW_BRANCH" || true
           git checkout -b "$NEW_BRANCH"
           git config --global user.email "db-ci-platform@diffblue.com"
           git config --global user.name "Diffblue CI"
@@ -38,7 +44,6 @@ jobs:
           git commit -m "Example Commit"
           git push -u origin "$NEW_BRANCH"
 
-      
       - name: Make pull request
         uses: repo-sync/pull-request@v2
         with:
@@ -47,3 +52,25 @@ jobs:
           pr_title: "Test PR"
           pr_body: "This is a test PR please ignore"
           github_token: ${{ github.token }}
+
+      # Find PR number
+      - name: Find pull request number
+        uses: juliangruber/find-pull-request-action@v1.0.2
+        id: find-pull-request
+        with:
+          github-token: ${{ github.token }}
+          branch: "${{ steps.branch-name.outputs.branch-name }}"
+
+      - name: Export pull request number
+        run: echo "Pull Request ${number} (${sha})"
+        env:
+          number: ${{ steps.find-pull-request.outputs.number }}
+          sha: ${{ steps.find-pull-request.outputs.head-sha }}
+
+      
+      - name: Update comment on PR
+        uses: phulsechinmay/rewritable-pr-comment@v0.2
+        with:
+          message: "Suggested changei Review [this PR](https://github.com/$GITHUB_REPOSITORY/pull/${{ steps.find-pull-request.outputs.number }})"
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
