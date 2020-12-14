@@ -45,7 +45,7 @@ jobs:
         id: analysis
         run: |
           sleep 10
-          if [ "$(git diff -p)" == ""]
+          if [ "false" == "true" ]
           then
             echo "No vunrability detected"
             echo "::set-output name=detected::false"
