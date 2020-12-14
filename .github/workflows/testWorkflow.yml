@@ -70,7 +70,7 @@ jobs:
 
     needs: analyse
 
-    if: "always()&&(needs.analyse.outputs.job_status=='failure')" 
+    if: always() 
 
     strategy:
       fail-fast: false
