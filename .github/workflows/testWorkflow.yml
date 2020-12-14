@@ -33,29 +33,33 @@ jobs:
           git config --global user.email "db-ci-platform@diffblue.com"
           git config --global user.name "Diffblue CI"
 
-      # Initializes the CodeQL tools for scanning.
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        id: initialize-codeql
-        with:
-          languages: ${{ matrix.language }}
-          # If you wish to specify custom queries, you can do so here or in a config file.
-          # By default, queries listed here will override any specified in a config file.
-          # Prefix the list here with "+" to use these queries and those in the config file.
-          # queries: ./path/to/local/query, your-org/your-repo/queries@main
-          queries: "./.github/codeql/specialized-sql-injection.ql"
+      # # Initializes the CodeQL tools for scanning.
+      # - name: Initialize CodeQL
+      #   uses: github/codeql-action/init@v1
+      #   id: initialize-codeql
+      #   with:
+      #     languages: ${{ matrix.language }}
+      #     # If you wish to specify custom queries, you can do so here or in a config file.
+      #     # By default, queries listed here will override any specified in a config file.
+      #     # Prefix the list here with "+" to use these queries and those in the config file.
+      #     # queries: ./path/to/local/query, your-org/your-repo/queries@main
+      #     queries: "./.github/codeql/specialized-sql-injection.ql"
 
 
-      - run: |
-          ./gradlew testClasses --no-daemon -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000
+      # - run: |
+      #     ./gradlew testClasses --no-daemon -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+      # - name: Perform CodeQL Analysis
+      #   uses: github/codeql-action/analyze@v1
 
-      - run: |
-          $CODEQL_DIST/codeql bqrs decode -r allEdges --format=json --output=../results/java-custom.allEdges.json $CODEQL_EXTRACTOR_JAVA_WIP_DATABASE/results/codeql-ccd-data-store-api/specialized-sql-injection.bqrs
-          cat  ../results/java-custom.allEdges.json
-          .github/bin/diffblue-security-fix ../results/java-custom.sarif ../results/java-custom.allEdges.json
+      # - run: |
+      #     $CODEQL_DIST/codeql bqrs decode -r allEdges --format=json --output=../results/java-custom.allEdges.json $CODEQL_EXTRACTOR_JAVA_WIP_DATABASE/results/codeql-ccd-data-store-api/specialized-sql-injection.bqrs
+      #     cat  ../results/java-custom.allEdges.json
+      #     .github/bin/diffblue-security-fix ../results/java-custom.sarif ../results/java-custom.allEdges.json
+
+      - name: Dummy changes
+        run: |
+          patch -p1 -i .github/smoke-and-mirrors.patch
 
       # Creates a new branch name based on the base
       - name: Output new branch name based of the base and head branch
