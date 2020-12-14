@@ -30,7 +30,7 @@ jobs:
         uses: phulsechinmay/rewritable-pr-comment@v0.2
         with:
           message: "Diffblue is analysing your PR for security vulnerabilities"
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
 
       - name: Setup git
@@ -114,5 +114,5 @@ jobs:
         uses: phulsechinmay/rewritable-pr-comment@v0.2
         with:
           message: "Diffblue has detected a vunrability caused by changes in your PR. We have automaticly create a fix for this and create a PR to fix which can be found [HERE](https://github.com/diffblue/ccd-data-store-api/pull/${{ steps.find-pull-request.outputs.number }}) "
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
