@@ -105,6 +105,6 @@ jobs:
       - name: Update comment on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2
         with:
-          message: "Diffblue has detected a vunrability caused by changes in your PR. Please review and merge [this PR](https://github.com/Diffblue-benchmarks/ccd-data-store-api/pull/${{ steps.find-pull-request.outputs.number }}) "
+          message: "Diffblue has detected a vunrability caused by changes in your PR. Please review and merge [this PR](https://github.com/diffblue/ccd-data-store-api/pull/${{ steps.find-pull-request.outputs.number }}) "
           GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
