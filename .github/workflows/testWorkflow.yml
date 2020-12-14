@@ -70,7 +70,7 @@ jobs:
 
     needs: analyse
 
-    if: needs.analyse.outputs.job_status=='failure'
+    if: always()
 
     strategy:
       fail-fast: false
@@ -97,6 +97,10 @@ jobs:
 
       - name: Setup git
         run: |
+          echo "TEST:"
+          echo "${{needs.analyse.outputs.job_status}}"
+          echo "${{needs.analyse.outputs.job_status=='failure'}}"
+          echo "TEST END"
           git fetch origin
           git checkout ${{ github.head_ref }}
           git config --global user.email "db-ci-platform@diffblue.com"
