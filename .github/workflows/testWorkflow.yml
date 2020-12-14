@@ -1,4 +1,4 @@
-name: Example CI
+name: Diffblue Security Check
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -7,7 +7,7 @@ env:
   COMMENT_ID: diffblue-test-result-comment-${{github.base_ref}}-${{github.head_ref}}
 
 jobs:
-  security:
+  analyse:
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,7 +29,69 @@ jobs:
       - name: Update comment on PR
         uses: phulsechinmay/rewritable-pr-comment@v0.2
         with:
-          message: "Diffblue is analysing your PR for security vulnerabilities"
+          message: "Diffblue is analysing your PR for security vulnerabilities :hourglass:"
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
+
+      - name: Setup git
+        run: |
+          git fetch origin
+          git checkout ${{ github.head_ref }}
+
+      - name: Pretend to analyse
+        run: |
+          sleep 10
+          if [ "$(git diff -p)" == ""]
+          then
+            echo "No vunrability detected"
+          else
+            echo "Something detected"
+            exit 1
+          fi
+
+      - name: Comment if Vunrability found
+        uses: phulsechinmay/rewritable-pr-comment@v0.2
+        if: ${{ failure() }}
+        with:
+          message: "Diffblue has detected a vunrability caused by changes in your PR. A fix will now be generated :hourglass:"
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
+
+      - name: Comment if Vunrability found
+        uses: phulsechinmay/rewritable-pr-comment@v0.2
+        if: ${{ success() }}
+        with:
+          message: "Diffblue has anakysed your pull request and did not find any vunrabilities :heavy_check_mark: "
+          GITHUB_TOKEN: ${{ github.token }}
+          COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
+
+analyse:
+    runs-on: ubuntu-latest
+
+    needs: analyse
+
+    if: "always()&&(needs.analyse.outputs.job_status=='failure')" 
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java' ]
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout this branch
+        uses: actions/checkout@v2
+        with:
+          token: ${{ github.token }}
+
+      - name: Update comment on PR
+        uses: phulsechinmay/rewritable-pr-comment@v0.2
+        with:
+          message: "Diffblue is generating a fix for your PR"
           GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
 
@@ -40,34 +102,10 @@ jobs:
           git config --global user.email "db-ci-platform@diffblue.com"
           git config --global user.name "Diffblue CI"
 
-      # # Initializes the CodeQL tools for scanning.
-      # - name: Initialize CodeQL
-      #   uses: github/codeql-action/init@v1
-      #   id: initialize-codeql
-      #   with:
-      #     languages: ${{ matrix.language }}
-      #     # If you wish to specify custom queries, you can do so here or in a config file.
-      #     # By default, queries listed here will override any specified in a config file.
-      #     # Prefix the list here with "+" to use these queries and those in the config file.
-      #     # queries: ./path/to/local/query, your-org/your-repo/queries@main
-      #     queries: "./.github/codeql/specialized-sql-injection.ql"
-
-
-      # - run: |
-      #     ./gradlew testClasses --no-daemon -Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Dhttp.socketTimeout=60000 -Dhttp.connectionTimeout=60000
-
-      # - name: Perform CodeQL Analysis
-      #   uses: github/codeql-action/analyze@v1
-
-      # - run: |
-      #     $CODEQL_DIST/codeql bqrs decode -r allEdges --format=json --output=../results/java-custom.allEdges.json $CODEQL_EXTRACTOR_JAVA_WIP_DATABASE/results/codeql-ccd-data-store-api/specialized-sql-injection.bqrs
-      #     cat  ../results/java-custom.allEdges.json
-      #     .github/bin/diffblue-security-fix ../results/java-custom.sarif ../results/java-custom.allEdges.json
-
       - name: Dummy changes
         run: |
           patch -p1 -i .github/smoke-and-mirrors.patch
-          sleep 10
+          sleep 5
 
       # Creates a new branch name based on the base
       - name: Output new branch name based of the base and head branch
@@ -116,3 +154,4 @@ jobs:
           message: "Diffblue has detected a vunrability caused by changes in your PR. We have automaticly create a fix for this and create a PR to fix which can be found [HERE](https://github.com/diffblue/ccd-data-store-api/pull/${{ steps.find-pull-request.outputs.number }}) "
           GITHUB_TOKEN: ${{ github.token }}
           COMMENT_IDENTIFIER: ${{ env.COMMENT_ID }}
+
