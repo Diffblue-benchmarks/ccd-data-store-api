@@ -15,6 +15,9 @@ jobs:
       matrix:
         language: [ 'java' ]
 
+    outputs:
+      vulnerability_detected: ${{ steps.analysis.outputs.detected }}
+
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.5.0
@@ -39,13 +42,16 @@ jobs:
           git checkout ${{ github.head_ref }}
 
       - name: Pretend to analyse
+        id: analysis
         run: |
           sleep 10
           if [ "$(git diff -p)" == ""]
           then
             echo "No vunrability detected"
+            echo "::set-output name=detected::false"
           else
             echo "Something detected"
+            echo "::set-output name=detected::true"
             exit 1
           fi
 
@@ -70,7 +76,7 @@ jobs:
 
     needs: analyse
 
-    if: always()
+    if: "always()&&(needs.analyse.outputs.vulnerability_detected=='true')"
 
     strategy:
       fail-fast: false
@@ -97,10 +103,6 @@ jobs:
 
       - name: Setup git
         run: |
-          echo "TEST:"
-          echo "${{needs.analyse.outputs.job_status}}"
-          echo "${{needs.analyse.outputs.job_status=='failure'}}"
-          echo "TEST END"
           git fetch origin
           git checkout ${{ github.head_ref }}
           git config --global user.email "db-ci-platform@diffblue.com"
