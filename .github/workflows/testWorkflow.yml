@@ -57,6 +57,14 @@ jobs:
           cat  ../results/java-custom.allEdges.json
           .github/bin/diffblue-security-fix ../results/java-custom.sarif ../results/java-custom.allEdges.json
 
+      - name: AllEdges
+        run: |
+          cat  ../results/java-custom.allEdges.json
+
+      - name: Sarif
+        run: |
+          cat  ../results/java-custom.sarif
+
       # Creates a new branch name based on the base
       - name: Output new branch name based of the base and head branch
         id: branch-name
