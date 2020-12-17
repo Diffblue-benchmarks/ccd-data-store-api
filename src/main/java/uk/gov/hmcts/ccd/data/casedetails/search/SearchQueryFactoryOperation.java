@@ -52,9 +52,12 @@ public class SearchQueryFactoryOperation {
 
     public Query build(MetaData metadata, Map<String, String> params, boolean isCountQuery) {
         final List<Criterion> criteria = criterionFactory.build(metadata, params);
+        String sortDirection = metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase();
+        if (sortDirection == null || !sortDirection.matches("^[a-zA-Z0-9]*$"))
+            sortDirection = "";
         String queryString = String.format(isCountQuery ? MAIN_COUNT_QUERY : MAIN_QUERY,
                                            secure(toClauses(criteria), metadata),
-                                           metadata.getSortDirection().orElse(SORT_ASCENDING).toUpperCase()
+            sortDirection
         );
         Query query;
         if (isCountQuery) {
